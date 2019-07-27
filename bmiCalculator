@@ -1,0 +1,97 @@
+#include "pch.h"
+
+#include <iostream>
+#include <vector>
+#include <array>
+#include <cmath>
+#include <iomanip>
+
+using namespace std;
+
+int main()
+{
+	//calculating bmi based on input vectors of weight, height
+	//output is bmi vector
+
+	//define all input vals
+	int vals{};
+	char units{};
+	vector<double> height;
+	vector<double> weight;
+	vector<double> bmi;
+
+	//define constants
+	const double lbsToKg{ 0.453592 }, ftToM{ 0.3048 };
+
+	cout << "How many values will you be entering?" << endl;
+	cin >> vals;
+	
+	//run different things based on units
+	//make sure proper units selected, if not inquire again
+
+	do {
+		cout << "What units will you be using? Enter m for metric, i for imperial" << endl;
+		cin >> units;
+
+		if (tolower(units) == 'm') {
+			cout << "Enter height in meters and weight in kg: " << endl;
+			//add each incoming value to vector of height/weight
+			for (int i{}; i < vals; ++i) {
+				double meters{}, kg{};
+				//first, get input
+				cin >> meters >> kg;
+				//now, add input to vector
+				height.push_back(meters);
+				weight.push_back(kg);
+			} //now have all needed input vals in vector
+
+		}
+		if (tolower(units) == 'i') {
+			//do same thing as above but for imperial
+			cout << "Enter height in feet and weight in lbs: " << endl;
+			for (int i{}; i < vals; ++i) {
+				double ft{}, lbs{};
+				//first, get input
+				cin >> ft >> lbs;
+				//now, add input to vector
+				//add in metric units
+				height.push_back(ft * ftToM);
+				weight.push_back(lbs * lbsToKg);
+			}
+		}
+	} while ((tolower(units) != 'm')& (tolower(units) != 'i'));
+
+	//now have necessary input in correct units with same number of values
+	//bmi = kg/m^2
+
+	for (int i{}; i < vals; ++i) {
+		double calc = weight[i] / (pow(height[i], 2));
+		bmi.push_back(calc);
+	}
+	
+	cout << "The following is the calculated BMI and respective weight class: " << endl;
+	cout << left << setw(16) << "BMI" << "Weight class" << '\n';
+
+	//now need to display bmi and description of weight class (ie underweight, healthy, overweight)
+	for (int i{}; i < vals; ++i) {
+		if (bmi[i] < 18.5) {
+			cout << left << setw(16) << bmi[i] << "underweight" << '\n';
+			continue;
+		}
+		if (18.5 <= bmi[i] < 25) {
+			cout << left << setw(16) << bmi[i] << "normal weight" << '\n';
+			continue;
+		}
+		if (25 <= bmi[i] < 30) {
+			cout << left << setw(16) << bmi[i] << "overweight" << '\n';
+			continue;
+		}
+		if (bmi[i] >= 30) {
+			cout << left << setw(16) << bmi[i] << "obese" << '\n';
+			continue;
+		}
+	}
+
+	return 0;
+
+}
