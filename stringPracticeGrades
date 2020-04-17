@@ -1,0 +1,118 @@
+
+#include "pch.h"
+
+#include <iostream>
+#include <vector>
+#include <array>
+#include <cmath>
+#include <iomanip>
+#include <string>
+#include <sstream>
+
+using namespace std;
+
+int main()
+{
+	//read student names, first and last, and grade 
+	//after, print out names and their grades, 3 / line in format
+	// last, first: grade%
+	//must use getline & extract names
+  
+	vector<float> grades;
+	string names;
+	string firstName;
+	string lastName;
+	float grade;
+	string inputName;
+	string separaters{ " ,.!?:;\n" };
+
+	cout << "Please enter the students first & last names. Additional names will be ignored. "
+		 << "Enter quit to terminate the program: " << endl;
+	getline(cin, inputName);
+
+	//make it lowercase for easier comparison/ensuring that correct capitalization
+	for_each(inputName.begin(), inputName.end(), [](char& c) {
+		c = tolower(c);
+		});
+
+	while (inputName != "quit") {
+		//find where two names are separated
+		size_t i = inputName.find_first_of(separaters);
+		//make sure that not accidental whitespace/punctuation before word
+		while (i == 0){
+			//remove punctuation/whitespace and try again
+			inputName.erase(i, 1);
+			i = inputName.find_first_of(separaters);
+		}
+		if (i == string::npos) {
+			cout << "Only one name entered. Quitting program..." << endl;
+			return 0;
+		}
+		firstName = inputName.substr(0, i);
+		inputName.erase(0, i + 1);
+		//now find location of second separator
+		size_t j = inputName.find_first_of(separaters);
+		while (j == 0) {
+			inputName.erase(j, 1);
+			j = inputName.find_first_of(separaters);
+		}
+		lastName = inputName.substr(0, j);
+		//make sure names were actually entered
+		if (!lastName.length()|| !firstName.length()) {
+			cout << "Error! Must enter two names. Quitting program..." << endl;
+			return 0;
+		}
+		//now make sure first letters are capitalized
+		firstName.at(0) = toupper(firstName.at(0));
+		lastName.at(0) = toupper(lastName.at(0));
+		//finally, get students' grades
+		cout << "Now please enter the numeric grade recieved by the student: " << endl;
+		cin >> grade;
+		//store everything where it belongs
+		grades.push_back(grade);
+		//use ? to separate names for easier cutting later on
+		if (names.length()) {
+			//nonempty
+			names += "?";
+		}
+		names += lastName + ", " + firstName + ": ";
+		//get new input from user
+		
+		cout << "Enter the next student or quit to terminate: " << endl;
+		string dummy;
+		getline(cin, dummy); //add newline here
+		getline(cin, inputName);
+		//make it lowercase for easier comparison/ensuring that correct capitalization
+		for_each(inputName.begin(), inputName.end(), [](char& c) {
+			c = tolower(c);
+			});
+	}
+	//now have all of the students and their grades so display them in correct format, as long as names is nonempty
+	int count = 0; //make sure 3/line
+	size_t i = 0;
+	while (names.length() != 0) {
+		size_t sep = names.find_first_of("?");
+		string output = names.substr(0, sep);
+		string gradesOut = to_string(grades.at(i));
+		if (gradesOut.find("100") != string::npos) {
+			gradesOut = "100.00";
+		}
+		gradesOut.erase(5, gradesOut.length());
+		
+		cout << setw(15) << output << gradesOut << "%";
+		++count;
+		if (count == 3) {
+			cout << "\n";
+			count = 0;
+		}
+		//now remove the string you outputted 
+		names.erase(0, sep + 1);
+		//and remove the grade
+		++i;
+		if (sep == string::npos || i > grades.size()) {
+			return 0;
+		}
+	}
+
+	return 0;
+}
